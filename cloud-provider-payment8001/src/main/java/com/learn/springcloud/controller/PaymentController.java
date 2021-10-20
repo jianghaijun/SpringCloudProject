@@ -5,11 +5,13 @@ import com.learn.springcloud.entities.ResultBase;
 import com.learn.springcloud.service.PaymentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @Slf4j
@@ -19,6 +21,9 @@ public class PaymentController {
 
     @Autowired
     private DiscoveryClient ciscoveryClient;
+
+    @Value("${server.port}")
+    private String serverPort;
 
     @PostMapping(value = "/payment/savePayment")
     public ResultBase savePayment(@RequestBody(required = false) Payment payment) {
@@ -40,5 +45,15 @@ public class PaymentController {
             log.info(instance.getInstanceId()  + "-" + instance.getHost() + ":" + instance.getPort() + "-" + instance.getUri() + "\t");
         }
         return ciscoveryClient;
+    }
+
+    @GetMapping(value = "/payment/getFeignTimeOut")
+    public String getFeignTimeOut() {
+        try {
+            TimeUnit.SECONDS.sleep(3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return serverPort;
     }
 }
